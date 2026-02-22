@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benimle çıkar mısın?</title>
+  <style>
+    :root { --bg1:#0f172a; --bg2:#111827; --card:#0b1220cc; --txt:#e5e7eb; }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; display:grid; place-items:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--txt);
+      background: radial-gradient(1200px 800px at 20% 10%, #7c3aed55, transparent 60%),
+                  radial-gradient(1000px 700px at 80% 90%, #06b6d455, transparent 60%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow:hidden;
+    }
+    .card{
+      width:min(560px, 92vw);
+      padding:28px 22px;
+      border-radius:24px;
+      background: var(--card);
+      border: 1px solid #ffffff1a;
+      box-shadow: 0 20px 60px #00000066;
+      text-align:center;
+      position:relative;
+    }
+    h1{margin:8px 0 10px; font-size:clamp(26px, 4vw, 40px); letter-spacing:-0.5px}
+    p{margin:0 0 18px; opacity:.9; line-height:1.4}
+    .buttons{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:14px}
+    button{
+      padding:12px 18px; border-radius:16px; border:1px solid #ffffff26;
+      background:#ffffff12; color:var(--txt); font-weight:700;
+      cursor:pointer; transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      min-width:140px; font-size:16px;
+    }
+    button:hover{transform: translateY(-1px); background:#ffffff1a; border-color:#ffffff3a}
+    .yes{background: linear-gradient(135deg, #22c55e66, #10b98166); border-color:#34d39955}
+    .yes:hover{background: linear-gradient(135deg, #22c55e88, #10b98188)}
+    .no{position:relative}
+    .result{
+      display:none;
+      margin-top:18px;
+      padding:14px 14px;
+      border-radius:16px;
+      background:#ffffff10;
+      border:1px solid #ffffff26;
+      font-size:16px;
+    }
+    .small{font-size:13px; opacity:.75; margin-top:10px}
+    /* confetti */
+    .confetti {
+      position: fixed; inset: -10px;
+      pointer-events:none;
+      overflow:hidden;
+      display:none;
+    }
+    .piece{
+      position:absolute;
+      width:10px; height:18px;
+      opacity:.95;
+      top:-30px;
+      animation: fall 1.8s linear forwards;
+      border-radius:2px;
+    }
+    @keyframes fall{
+      to{ transform: translateY(110vh) rotate(720deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">Mina Hanım Benimle çıkar mısınız?</h1>
+    <p id="subtitle">Bunu okumaya geldiysen zaten… bir şans ver 😄</p>
+
+    <div class="buttons">
+      <button class="yes" id="yesBtn">Evet</button>
+      <button class="no" id="noBtn">Hayır</button>
+    </div>
+
+    <div class="result" id="result"></div>
+    <div class="small">Not: “Hayır” biraz şakacı olabilir 🙈</div>
+  </div>
+
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const result = document.getElementById("result");
+    const confetti = document.getElementById("confetti");
+
+    // "Hayır" butonu kaçsın (istersen kapat: escapeNo = false)
+    const escapeNo = true;
+
+    function rand(min, max){ return Math.random()*(max-min)+min; }
+
+    function moveNoButton(){
+      const pad = 12;
+      const vw = window.innerWidth, vh = window.innerHeight;
+
+      const rect = noBtn.getBoundingClientRect();
+      const w = rect.width, h = rect.height;
+
+      const x = rand(pad, vw - w - pad);
+      const y = rand(pad, vh - h - pad);
+
+      noBtn.style.position = "fixed";
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+    }
+
+    if(escapeNo){
+      noBtn.addEventListener("mouseenter", moveNoButton);
+      noBtn.addEventListener("touchstart", (e) => { e.preventDefault(); moveNoButton(); }, {passive:false});
+    }
+
+    function boomConfetti(){
+      confetti.style.display = "block";
+      confetti.innerHTML = "";
+      const colors = ["#60a5fa","#34d399","#f472b6","#fbbf24","#a78bfa","#fb7185"];
+
+      const count = 140;
+      for(let i=0;i<count;i++){
+        const d = document.createElement("div");
+        d.className = "piece";
+        d.style.left = rand(0, 100) + "vw";
+        d.style.background = colors[Math.floor(rand(0, colors.length))];
+        d.style.transform = `rotate(${rand(0,360)}deg)`;
+        d.style.animationDuration = rand(1.4, 2.4) + "s";
+        d.style.width = rand(7, 12) + "px";
+        d.style.height = rand(10, 20) + "px";
+        confetti.appendChild(d);
+      }
+      setTimeout(()=> confetti.style.display="none", 2600);
+    }
+
+    yesBtn.addEventListener("click", () => {
+      boomConfetti();
+      result.style.display = "block";
+      result.innerHTML = "Miniş 😄💛 Tamamdır! O zaman şaka maka… <b>13 Haziran’da evleniyoruz</b> 😅💍: ;
+      noBtn.style.opacity = .4;
+      noBtn.disabled = true;
+      yesBtn.disabled = true;
+    });
+
+    noBtn.addEventListener("click", () => {
+      result.style.display = "block";
+      result.innerHTML = "Tamam… ama bir daha düşün 😌";
+    });
+  </script>
+</body>
+</html>
